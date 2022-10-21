@@ -1,60 +1,70 @@
-import React from 'react'
-import { Button, Card, List, message, Tabs, Tooltip } from 'antd'
-import { StarOutlined, StarFilled } from '@ant-design/icons'
-import { addFavoriteItem, deleteFavoriteItem } from '../utils'
+import React from "react";
+import { Button, Card, List, message, Tabs, Tooltip } from "antd";
+import { StarOutlined, StarFilled } from "@ant-design/icons";
+import { addFavoriteItem, deleteFavoriteItem } from "../utils";
 
-const { TabPane } = Tabs
+const { TabPane } = Tabs;
 const tabKeys = {
-  Streams: 'stream',
-  Videos: 'videos',
-  Clips: 'clips',
-}
+  Streams: "stream",
+  Videos: "videos",
+  Clips: "clips",
+};
 
-const processUrl = (url) => url
-  .replace('%{height}', '252')
-  .replace('%{width}', '480')
-  .replace('{height}', '252')
-  .replace('{width}', '480')
+const processUrl = (url) =>
+  url
+    .replace("%{height}", "252")
+    .replace("%{width}", "480")
+    .replace("{height}", "252")
+    .replace("{width}", "480");
 
 const renderCardTitle = (item, loggedIn, favs = [], favOnChange) => {
-  const title = `${item.broadcaster_name} - ${item.title}`
+  const title = `${item.broadcaster_name} - ${item.title}`;
 
-  const isFav = favs.find((fav) => fav.id === item.id)
+  const isFav = favs.find((fav) => fav.id === item.id);
 
   const favOnClick = () => {
     if (isFav) {
-      deleteFavoriteItem(item).then(() => {
-        favOnChange()
-      }).catch(err => {
-        message.error(err.message)
-      })
+      deleteFavoriteItem(item)
+        .then(() => {
+          favOnChange();
+        })
+        .catch((err) => {
+          message.error(err.message);
+        });
 
-      return
+      return;
     }
 
-    addFavoriteItem(item).then(() => {
-      favOnChange()
-    }).catch(err => {
-      message.error(err.message)
-    })
-  }
+    addFavoriteItem(item)
+      .then(() => {
+        favOnChange();
+      })
+      .catch((err) => {
+        message.error(err.message);
+      });
+  };
 
   return (
     <>
-      {
-        loggedIn &&
-        <Tooltip title={isFav ? "Remove from favorite list" : "Add to favorite list"}>
-          <Button shape="circle" icon={isFav ? <StarFilled /> : <StarOutlined />} onClick={favOnClick} />
+      {loggedIn && (
+        <Tooltip
+          title={isFav ? "Remove from favorite list" : "Add to favorite list"}
+        >
+          <Button
+            shape="circle"
+            icon={isFav ? <StarFilled /> : <StarOutlined />}
+            onClick={favOnClick}
+          />
         </Tooltip>
-      }
-      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', width: 450 }}>
+      )}
+      <div style={{ overflow: "hidden", textOverflow: "ellipsis", width: 450 }}>
         <Tooltip title={title} placement="topLeft">
           <span>{title}</span>
         </Tooltip>
       </div>
     </>
-  )
-}
+  );
+};
 
 const renderCardGrid = (data, loggedIn, favs, favOnChange) => {
   return (
@@ -67,12 +77,10 @@ const renderCardGrid = (data, loggedIn, favs, favOnChange) => {
         xl: 3,
       }}
       dataSource={data}
-      renderItem={item => (
-        <List.Item style={{ marginRight: '20px' }}>
-          <Card
-            title={renderCardTitle(item, loggedIn, favs, favOnChange)}
-          >
-             <a
+      renderItem={(item) => (
+        <List.Item style={{ marginRight: "20px" }}>
+          <Card title={renderCardTitle(item, loggedIn, favs, favOnChange)}>
+            <a
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -88,17 +96,19 @@ const renderCardGrid = (data, loggedIn, favs, favOnChange) => {
         </List.Item>
       )}
     />
-  )
-}
+  );
+};
 
 const Home = ({ resources, loggedIn, favoriteItems, favoriteOnChange }) => {
-  const { VIDEO, STREAM, CLIP } = resources
-  const { VIDEO: favVideos, STREAM: favStreams, CLIP: favClips } = favoriteItems
+  const { VIDEO, STREAM, CLIP } = resources;
+  const {
+    VIDEO: favVideos,
+    STREAM: favStreams,
+    CLIP: favClips,
+  } = favoriteItems;
 
   return (
-    <Tabs
-      defaultActiveKey={tabKeys.Streams}
-    >
+    <Tabs defaultActiveKey={tabKeys.Streams}>
       <TabPane tab="Streams" key={tabKeys.Streams} forceRender={true}>
         {renderCardGrid(STREAM, loggedIn, favStreams, favoriteOnChange)}
       </TabPane>
@@ -109,7 +119,7 @@ const Home = ({ resources, loggedIn, favoriteItems, favoriteOnChange }) => {
         {renderCardGrid(CLIP, loggedIn, favClips, favoriteOnChange)}
       </TabPane>
     </Tabs>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
